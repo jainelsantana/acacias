@@ -147,7 +147,7 @@ type Overlay =
   | { type: 'gallery'; index: number }
   | null;
 
-export default function BandHome({ content: c }: { content: SiteContent }) {
+export default function BandHome({ content: c, staticDemo = false }: { content: SiteContent; staticDemo?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [archive, setArchive] = useState(false);
@@ -939,7 +939,15 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
                 </External>
               )}
             </div>
-            <BookingForm />
+            {staticDemo ? (
+              <div className="booking-demo">
+                <Tag>CONTATO COM A BANDA</Tag>
+                <h3>Vamos conversar?</h3>
+                <p className="body-copy">Para shows e parcerias, fale com a Acácias pelo Instagram.</p>
+                {instagram?.url && <External href={instagram.url} className="button button-blue">FALAR COM A ACÁCIAS</External>}
+                <p className="booking-demo-note">Esta é uma demonstração do site. O formulário de contratação será disponibilizado na versão completa.</p>
+              </div>
+            ) : <BookingForm />}
           </div>
         </section>
         <section className="social-strip">

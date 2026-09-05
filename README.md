@@ -70,6 +70,14 @@ Para verificar a autenticação antes de configurar a conta real, aplique as mig
 
 ## Publicação e limites
 
+### Demonstração no GitHub Pages
+
+O endereço de demonstração é https://jainelsantana.github.io/acacias/. A publicação usa GitHub Actions (`.github/workflows/pages.yml`), que executa `npm run build:pages` e envia somente `outputs/github-pages`. Em Settings → Pages, a origem deve ser **GitHub Actions**. As pastas raiz e `docs` contêm código e documentação, não o site compilado.
+
+A demonstração reutiliza os componentes, estilos, fotos e animações do site, com o conteúdo editorial público definido no código. O HTML já contém a página antes do JavaScript carregar. Como Pages não executa o banco nem as APIs, essa versão usa um link para o Instagram no lugar do formulário de contratação. O painel e as solicitações continuam disponíveis na aplicação completa, que requer Workers/D1. Não são exportados contas, senhas, sessões, solicitações ou conteúdo privado do banco local.
+
+### Aplicação completa
+
 A prévia é privada, disponível à conta proprietária. Antes de tornar o site público, preencha os materiais oficiais, aprove os textos e revise fotos, créditos e contatos. O domínio em `lib/content.ts` alimenta canonical, sitemap e metadados. Atualize-o se adotar um domínio próprio.
 
 A troca de autenticação foi aplicada e testada no ambiente local. A política de acesso da hospedagem é independente do login do painel e permanece inalterada. Uma publicação posterior deve aplicar as migrações e provisionar o primeiro acesso no banco hospedado; o comando `studio:setup` atua exclusivamente no banco local. O custo de autenticação deve ser validado no limite de CPU da hospedagem sem reduzir os parâmetros de proteção da senha.
