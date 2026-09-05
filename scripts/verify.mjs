@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { localStudioCookie } from './local-studio-session.mjs';
 import {
   initialContent,
   validateContent,
@@ -52,11 +53,7 @@ const spoof = await fetch(base + '/api/studio', {
 });
 assert.equal(spoof.status, 403);
 check('Editor API rejects anonymous visitors and spoofed identity headers');
-const signIn = await fetch(base + '/signin-with-chatgpt?return_to=%2Fstudio', {
-  redirect: 'manual',
-});
-const cookie = signIn.headers.get('set-cookie')?.split(';')[0];
-assert(cookie);
+const cookie = await localStudioCookie(base);
 const headers = {
   Cookie: cookie,
   Origin: base,

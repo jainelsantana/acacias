@@ -1,3 +1,12 @@
+import {
+  instagramGallery,
+  instagramMembers,
+  instagramManifesto,
+  instagramProfile,
+  officialYoutube,
+  portatilLinks,
+} from './instagram-content.ts';
+
 export const platformFields = [
   'spotifyUrl',
   'appleUrl',
@@ -41,6 +50,7 @@ export type Member = {
   name: string;
   role: string;
   image: string;
+  imagePosition?: string;
   credit: string;
 };
 export type SiteContent = {
@@ -101,14 +111,12 @@ export const initialContent: SiteContent = {
   manifesto: {
     text: 'Tem coisa que só uma canção consegue dizer. Entre a MPB contemporânea, o dream pop e a música brasileira, a Acácias faz do afeto o seu ponto de encontro. De Teresina, Piauí, para sentir de perto.',
     approved: false,
-    image: '',
-    alt: '',
-    credit: '',
+    ...instagramManifesto,
   },
   featuredId: '',
   releases: [
     release('esconderijo', 'Esconderijo'),
-    release('portatil', 'Portátil'),
+    { ...release('portatil', 'Portátil'), ...portatilLinks },
   ],
   video: {
     title: 'Beijos Sonoros, Grandes Concertos',
@@ -117,8 +125,8 @@ export const initialContent: SiteContent = {
     credit: '',
   },
   shows: [],
-  gallery: [],
-  members: [],
+  gallery: instagramGallery,
+  members: instagramMembers,
   press: {
     kitUrl: '',
     photosUrl: '',
@@ -127,7 +135,7 @@ export const initialContent: SiteContent = {
     stageUrl: '',
   },
   contact: { email: '', whatsapp: '' },
-  socials: [],
+  socials: [instagramProfile, officialYoutube],
   news: [],
 };
 export const siteOrigin = 'https://acacias-musica.jainel238801.chatgpt.site';
@@ -222,7 +230,12 @@ export function validateContent(v: unknown): v is SiteContent {
     return false;
   if (
     c.gallery.some((p) => !p.src || !p.alt) ||
-    c.members.some((m) => !m.name || !m.role) ||
+    c.members.some(
+      (m) =>
+        !m.name ||
+        (m.imagePosition !== undefined &&
+          !['', 'left', 'center', 'right'].includes(m.imagePosition)),
+    ) ||
     c.releases.some((r) => !r.title || !r.format)
   )
     return false;

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { siteOrigin } from '@/lib/content';
 import './globals.css';
+import './motion.css';
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
   title: 'ACÁCIAS — Banda de Teresina, Piauí',

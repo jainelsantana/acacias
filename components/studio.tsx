@@ -103,11 +103,12 @@ const sections: Section[] = [
     key: 'members',
     label: 'Integrantes',
     list: true,
-    help: 'Mantenha a formação atualizada. Informe os nomes e as funções confirmadas pela banda.',
+    help: 'Informe somente funções confirmadas; deixe em branco se ainda faltarem as legendas. Em imagens com duas pessoas, o enquadramento pode ser left (esquerda), center (centro) ou right (direita).',
     fields: [
       ['name', 'Nome'],
       ['role', 'Instrumento / função'],
       ['image', 'URL do retrato', 'url'],
+      ['imagePosition', 'Enquadramento (left, center ou right)'],
       ['credit', 'Crédito do retrato'],
     ],
   },
@@ -299,9 +300,11 @@ export default function Studio() {
             VER SITE
             <ArrowUpRight size={18} />
           </a>
-          <a href="/signout-with-chatgpt?return_to=%2Fstudio" target="_top">
-            Sair
-          </a>
+          <form action="/api/auth/logout" method="post">
+            <button type="submit" className="text-link">
+              Sair
+            </button>
+          </form>
         </div>
       </header>
       {!data ? (

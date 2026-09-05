@@ -1,11 +1,13 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
+import { useSiteMotion } from '@/hooks/use-site-motion';
 import {
   ArrowUpRight,
   ArrowDown,
   ArrowLeft,
   ArrowRight,
   Play,
+  Pause,
   Plus,
   Menu,
   X,
@@ -149,7 +151,8 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [archive, setArchive] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const { rootRef, enabled, reducedMotion, scrolled, toggleMotion } =
+    useSiteMotion();
   const featured = c.releases.find((r) => r.id === c.featuredId);
   const instagram = c.socials.find(
     (s) => s.label.toLowerCase() === 'instagram',
@@ -164,27 +167,6 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
     .filter((s) => s.date < today)
     .sort((a, b) => b.date.localeCompare(a.date));
   const shown = archive ? past : upcoming;
-  useEffect(() => {
-    const scroll = () => setScrolled(window.scrollY > 70);
-    scroll();
-    window.addEventListener('scroll', scroll, { passive: true });
-    const elements = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add('revealed');
-            observer.unobserve(e.target);
-          }
-        }),
-      { threshold: 0.08 },
-    );
-    elements.forEach((e) => observer.observe(e));
-    return () => {
-      window.removeEventListener('scroll', scroll);
-      observer.disconnect();
-    };
-  }, []);
   const changePhoto = (delta: number) =>
     setOverlay((o) =>
       o?.type === 'gallery'
@@ -210,7 +192,11 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
     return () => window.removeEventListener('keydown', key);
   }, [overlay?.type, c.gallery.length]);
   return (
-    <>
+    <div
+      ref={rootRef}
+      className="band-experience"
+      data-motion={enabled ? 'on' : 'off'}
+    >
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
@@ -221,6 +207,7 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
           (c.hero.image && !scrolled ? 'over-photo' : '')
         }
       >
+        <span className="reading-progress" aria-hidden="true" />
         <a
           href="#inicio"
           className="small-wordmark"
@@ -249,7 +236,11 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
         </button>
       </header>
       <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
-        <DialogContent className="mobile-menu" showCloseButton={false}>
+        <DialogContent
+          className="mobile-menu"
+          showCloseButton={false}
+          data-motion={enabled ? 'on' : 'off'}
+        >
           <div className="mobile-menu-top">
             <DialogTitle className="small-wordmark">ACÁCIAS</DialogTitle>
             <DialogClose className="round-button" aria-label="Fechar menu">
@@ -292,8 +283,17 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
             <Tag>TERESINA, PIAUÍ · BRASIL</Tag>
             <Tag>INDEPENDENTE POR NATUREZA</Tag>
           </div>
-          <h1 className="hero-wordmark" id="hero-title">
-            ACÁCIAS
+          <h1 className="hero-wordmark" id="hero-title" aria-label="ACÁCIAS">
+            {'ACÁCIAS'.split('').map((letter, index) => (
+              <span
+                key={index}
+                className="hero-letter"
+                aria-hidden="true"
+                style={{ '--letter-index': index } as CSSProperties}
+              >
+                <span>{letter}</span>
+              </span>
+            ))}
           </h1>
           <div className="hero-bottom">
             <div className="hero-signature">
@@ -336,6 +336,27 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
                 ? c.hero.credit
                 : 'ESPAÇO RESERVADO PARA FOTOGRAFIA OFICIAL'}
             </span>
+            <button
+              className="motion-toggle"
+              onClick={toggleMotion}
+              disabled={reducedMotion}
+              title={
+                reducedMotion
+                  ? 'Seguindo a preferência de movimento reduzido do seu dispositivo'
+                  : undefined
+              }
+            >
+              {enabled ? (
+                <Pause size={14} aria-hidden="true" />
+              ) : (
+                <Play size={14} aria-hidden="true" />
+              )}
+              {reducedMotion
+                ? 'MOVIMENTO REDUZIDO'
+                : enabled
+                  ? 'PAUSAR MOVIMENTO'
+                  : 'ATIVAR MOVIMENTO'}
+            </button>
             <a href="#sobre">
               SINTA. ESCUTE. FIQUE.
               <ArrowDown size={14} />
@@ -735,7 +756,9 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
               <em>mesmo depois do fim da música.</em>
             </p>
             {instagram && (
-              <External href={instagram.url}>ACOMPANHE NO INSTAGRAM</External>
+              <External href={instagram.url}>
+                ACOMPANHE @{instagram.url.split('/').filter(Boolean).at(-1)}
+              </External>
             )}
           </div>
         </section>
@@ -753,7 +776,7 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
             <p className="body-copy">
               Vozes, encontros e sensibilidades.
               <br />
-              Uma banda independente de Teresina, Piauí.
+              Uma banda independente de Teresina, Piauí. Desde 2016.
             </p>
           </div>
           {c.members.length ? (
@@ -761,14 +784,17 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
               {c.members.map((m, i) => (
                 <figure key={m.id} className="member reveal">
                   {m.image ? (
-                    <img
-                      src={m.image}
-                      alt={m.name}
-                      width={600}
-                      height={800}
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <div className="member-portrait">
+                      <img
+                        src={m.image}
+                        alt={m.name}
+                        width={600}
+                        height={800}
+                        loading="lazy"
+                        decoding="async"
+                        style={{ objectPosition: m.imagePosition || 'center' }}
+                      />
+                    </div>
                   ) : (
                     <PhotoSlot
                       label="RETRATO OFICIAL"
@@ -777,7 +803,11 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
                   )}
                   <figcaption>
                     <h3>{m.name}</h3>
-                    <p>{m.role}</p>
+                    {m.role ? (
+                      <p>{m.role}</p>
+                    ) : (
+                      <Pending>Função a confirmar</Pending>
+                    )}
                     {m.credit && <small>{m.credit}</small>}
                   </figcaption>
                 </figure>
@@ -946,7 +976,7 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
           </a>
         </div>
         <a
-          className="footer-wordmark"
+          className="footer-wordmark reveal"
           href="#inicio"
           aria-label="Acácias — voltar ao início"
         >
@@ -975,6 +1005,7 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
         }}
       >
         <DialogContent
+          data-motion={enabled ? 'on' : 'off'}
           className={
             'media-dialog ' + (overlay?.type === 'gallery' ? 'lightbox' : '')
           }
@@ -1105,7 +1136,7 @@ export default function BandHome({ content: c }: { content: SiteContent }) {
           )}
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }
 
