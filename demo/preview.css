@@ -1,3 +1,4 @@
-.booking-demo { display: grid; align-content: center; justify-items: start; gap: 24px; padding: clamp(28px, 4vw, 64px); border: 1px solid var(--blue); }
-.booking-demo h3 { font: 400 clamp(2rem, 4vw, 3.5rem)/1.1 Georgia, serif; }
-.booking-demo-note { max-width: 36rem; font-size: 0.875rem; line-height: 1.6; }
+.form-handoff-intro { margin: -5px 0 28px; font-size: 1rem; line-height: 1.6; }
+.form-handoff { display: grid; gap: 20px; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--blue); }
+.form-handoff > p { font-size: 1rem; line-height: 1.6; color: var(--blue); }
+.form-handoff .text-link { justify-self: start; }

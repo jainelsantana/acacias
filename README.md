@@ -74,7 +74,9 @@ Para verificar a autenticação antes de configurar a conta real, aplique as mig
 
 O endereço de demonstração é https://jainelsantana.github.io/acacias/. A publicação usa GitHub Actions (`.github/workflows/pages.yml`), que executa `npm run build:pages` e envia somente `outputs/github-pages`. Em Settings → Pages, a origem deve ser **GitHub Actions**. As pastas raiz e `docs` contêm código e documentação, não o site compilado.
 
-A demonstração reutiliza os componentes, estilos, fotos e animações do site, com o conteúdo editorial público definido no código. O HTML já contém a página antes do JavaScript carregar. Como Pages não executa o banco nem as APIs, essa versão usa um link para o Instagram no lugar do formulário de contratação. O painel e as solicitações continuam disponíveis na aplicação completa, que requer Workers/D1. Não são exportados contas, senhas, sessões, solicitações ou conteúdo privado do banco local.
+A demonstração reutiliza os componentes, estilos, fotos e animações do site, com o conteúdo editorial público definido no código. O HTML já contém a página antes do JavaScript carregar. O formulário de contato está disponível também no Pages: com o Instagram como único contato confirmado, ele prepara e copia a solicitação para o visitante enviar à banda. Se um WhatsApp ou e-mail for definido no conteúdo público, o formulário passa a preparar a mensagem nesse canal. A interface informa que o visitante precisa concluir o envio; não simula recebimento nem grava os dados no navegador. Se a cópia automática estiver bloqueada, o texto continua disponível para cópia manual.
+
+Pages não executa o banco nem as APIs. O registro direto das solicitações no painel continua disponível na aplicação completa, que requer Workers/D1. Não são exportados contas, senhas, sessões, solicitações ou conteúdo privado do banco local.
 
 ### Aplicação completa
 

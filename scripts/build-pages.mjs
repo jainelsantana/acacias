@@ -16,6 +16,6 @@ const { render } = await import(pathToFileURL(resolve('outputs/pages-render/rend
 const htmlPath = 'outputs/github-pages/index.html';
 const template = await readFile(htmlPath, 'utf8');
 if (!template.includes('<!--acacias-prerender-->')) throw new Error('Prerender placeholder missing.');
-await writeFile(htmlPath, template.replace('<!--acacias-prerender-->', render()));
+await writeFile(htmlPath, template.replace('<!--acacias-prerender-->', () => render()));
 await writeFile('outputs/github-pages/.nojekyll', '');
 console.log('Demonstração estática pronta em outputs/github-pages.');

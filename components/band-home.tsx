@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, type CSSProperties } from 'react';
 import { useSiteMotion } from '@/hooks/use-site-motion';
+import { bookingMessage, bookingDestination, type BookingContact } from '@/lib/booking-message';
 import {
   ArrowUpRight,
   ArrowDown,
@@ -939,15 +940,7 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
                 </External>
               )}
             </div>
-            {staticDemo ? (
-              <div className="booking-demo">
-                <Tag>CONTATO COM A BANDA</Tag>
-                <h3>Vamos conversar?</h3>
-                <p className="body-copy">Para shows e parcerias, fale com a Acácias pelo Instagram.</p>
-                {instagram?.url && <External href={instagram.url} className="button button-blue">FALAR COM A ACÁCIAS</External>}
-                <p className="booking-demo-note">Esta é uma demonstração do site. O formulário de contratação será disponibilizado na versão completa.</p>
-              </div>
-            ) : <BookingForm />}
+            <BookingForm staticContact={staticDemo ? { ...c.contact, instagramUrl: instagram?.url } : undefined} />
           </div>
         </section>
         <section className="social-strip">
@@ -1148,17 +1141,42 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
   );
 }
 
-function BookingForm() {
+function BookingForm({ staticContact }: { staticContact?: BookingContact }) {
   const [status, setStatus] = useState<
     'idle' | 'sending' | 'success' | 'error'
   >('idle');
   const [error, setError] = useState('');
+  const [prepared, setPrepared] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [today, setToday] = useState('');
+  const destination = staticContact ? bookingDestination(staticContact, prepared) : null;
+  useEffect(() => {
+    setToday(new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }));
+  }, []);
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     setStatus('sending');
     setError('');
     const data = Object.fromEntries(new FormData(form));
+    if (staticContact) {
+      const message = bookingMessage(data);
+      const target = bookingDestination(staticContact, message);
+      setPrepared(message);
+      setCopied(false);
+      if (target) {
+        window.location.assign(target.url);
+      } else {
+        try {
+          await navigator.clipboard.writeText(message);
+          setCopied(true);
+        } catch {
+          // Keep the complete message available for manual copying.
+        }
+      }
+      setStatus('idle');
+      return;
+    }
     try {
       const res = await fetch('/api/booking', {
         method: 'POST',
@@ -1201,11 +1219,21 @@ function BookingForm() {
       </div>
     );
   return (
-    <form className="booking-form" onSubmit={submit}>
+    <form className="booking-form" onSubmit={submit} onChange={() => {
+      setPrepared('');
+      setCopied(false);
+    }}>
       <div className="form-intro">
         <Tag>CONTE SOBRE O SEU EVENTO</Tag>
         <span>* Campos obrigatórios</span>
       </div>
+      {staticContact && (
+        <p className="form-handoff-intro">
+          {destination
+            ? `Preencha os dados para preparar sua solicitação. Você conclui o envio pelo ${destination.channel}.`
+            : 'Preencha os dados. Depois, copie sua solicitação e envie pelo Instagram da banda.'}
+        </p>
+      )}
       <div className="form-grid">
         <label>
           Seu nome *
@@ -1250,9 +1278,7 @@ function BookingForm() {
           <input
             name="date"
             type="date"
-            min={new Date().toLocaleDateString('en-CA', {
-              timeZone: 'America/Sao_Paulo',
-            })}
+            min={today || undefined}
           />
         </label>
         <label>
@@ -1292,7 +1318,9 @@ function BookingForm() {
         </label>
       </div>
       <p className="form-privacy">
-        Seus dados serão usados pela produção para tratar esta solicitação.
+        {staticContact
+          ? 'Os dados só chegam à banda quando você conclui o envio no canal de contato.'
+          : 'Seus dados serão usados pela produção para tratar esta solicitação.'}
       </p>
       {error && (
         <p className="form-error" role="alert">
@@ -1301,20 +1329,43 @@ function BookingForm() {
       )}
       <button
         className="button button-blue form-submit"
-        disabled={status === 'sending'}
+        disabled={status === 'sending' || !today}
       >
         {status === 'sending' ? (
           <>
-            REGISTRANDO SOLICITAÇÃO
+            {staticContact ? 'PREPARANDO SOLICITAÇÃO' : 'REGISTRANDO SOLICITAÇÃO'}
             <LoaderCircle className="spin" size={20} />
           </>
         ) : (
           <>
-            CONTRATAR ACÁCIAS
+            {staticContact
+              ? destination?.channel === 'WhatsApp' ? 'CONTINUAR NO WHATSAPP'
+                : destination ? 'PREPARAR E-MAIL' : 'COPIAR SOLICITAÇÃO'
+              : 'CONTRATAR ACÁCIAS'}
             <ArrowUpRight size={20} />
           </>
         )}
       </button>
+      {staticContact && prepared && (
+        <div className="form-handoff">
+          <p role="status">
+            {destination
+              ? `Sua mensagem está preparada. Conclua o envio no ${destination.channel}.`
+              : copied
+                ? 'Solicitação copiada. Abra o Instagram da Acácias e cole o texto em uma mensagem.'
+                : 'A cópia automática não ficou disponível. Selecione e copie o texto abaixo para enviar à banda.'}
+          </p>
+          <label>
+            Sua solicitação
+            <textarea readOnly value={prepared} rows={7} onFocus={event => event.currentTarget.select()} />
+          </label>
+          {destination ? (
+            <External href={destination.url}>ABRIR {destination.channel.toUpperCase()}</External>
+          ) : staticContact.instagramUrl ? (
+            <External href={staticContact.instagramUrl}>ABRIR INSTAGRAM DA ACÁCIAS</External>
+          ) : null}
+        </div>
+      )}
     </form>
   );
 }
