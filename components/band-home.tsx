@@ -194,6 +194,8 @@ export default function BandHome({
   content: SiteContent;
   staticDemo?: boolean;
 }) {
+  const assetPath = (path: string) =>
+    staticDemo && path.startsWith('/') ? '/acacias' + path : path;
   const [menuOpen, setMenuOpen] = useState(false);
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [archive, setArchive] = useState(false);
@@ -265,7 +267,7 @@ export default function BandHome({
           aria-label="Acácias — início"
         >
           <img
-            src="/images/logo.png"
+            src={assetPath('/images/logo.png')}
             alt="Banda Acácias"
             className="header-logo-img"
           />
@@ -299,7 +301,7 @@ export default function BandHome({
           <div className="mobile-menu-top">
             <DialogTitle className="small-wordmark">
               <img
-                src="/images/logo.png"
+                src={assetPath('/images/logo.png')}
                 alt="Banda Acácias"
                 className="header-logo-img"
               />
@@ -359,7 +361,7 @@ export default function BandHome({
           </div>
           <h1 className="hero-wordmark" id="hero-title" aria-label="ACÁCIAS">
             <img
-              src="/images/logo.png"
+              src={assetPath('/images/logo.png')}
               alt="Banda Acácias"
               className="hero-logo-img"
             />
@@ -1073,7 +1075,7 @@ export default function BandHome({
           aria-label="Acácias — voltar ao início"
         >
           <img
-            src="/images/logo.png"
+            src={assetPath('/images/logo.png')}
             alt="Banda Acácias"
             className="footer-logo-img"
           />
@@ -1172,7 +1174,7 @@ export default function BandHome({
               <div className="video-channel">
                 <img
                   className="video-channel-mark"
-                  src="/icon.png?v=2"
+                  src={assetPath('/icon.png?v=2')}
                   alt=""
                   width={56}
                   height={56}
