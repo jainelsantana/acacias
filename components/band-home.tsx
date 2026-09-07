@@ -1,7 +1,19 @@
 'use client';
 import { useEffect, useState, type CSSProperties } from 'react';
 import { useSiteMotion } from '@/hooks/use-site-motion';
-import { bookingMessage, bookingDestination, type BookingContact } from '@/lib/booking-message';
+import { SocialPlatformLink } from '@/components/social-platform-link';
+import { VideoThumbnail } from '@/components/video-thumbnail';
+import {
+  identifyPlatform,
+  listeningPlatforms,
+  platformAriaLabel,
+  type Platform,
+} from '@/lib/platforms';
+import {
+  bookingMessage,
+  bookingDestination,
+  type BookingContact,
+} from '@/lib/booking-message';
 import {
   ArrowUpRight,
   ArrowDown,
@@ -34,6 +46,7 @@ import {
 const nav = [
   ['Sobre', 'sobre'],
   ['Música', 'musica'],
+  ['Ouça', 'ouca'],
   ['Vídeos', 'videos'],
   ['Agenda', 'agenda'],
   ['Galeria', 'galeria'],
@@ -43,6 +56,23 @@ const nav = [
 const outbound = { target: '_blank', rel: 'noopener noreferrer' };
 function Tag({ children }: { children: React.ReactNode }) {
   return <span className="eyebrow">{children}</span>;
+}
+function BurstIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 100 100"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M50 4v92M4 50h92M17.5 17.5l65 65M82.5 17.5l-65 65"
+        stroke="currentColor"
+        strokeWidth="6"
+      />
+    </svg>
+  );
 }
 function Pending({ children }: { children: React.ReactNode }) {
   return (
@@ -127,15 +157,24 @@ function Cover({
   );
 }
 function Platforms({ release }: { release: Release }) {
+  const ids: Platform[] = ['spotify', 'apple-music', 'youtube', 'deezer'];
   const links = platformFields.flatMap((field, i) =>
-    release[field] ? [{ url: release[field], label: platformLabels[i] }] : [],
+    release[field]
+      ? [{ url: release[field], label: platformLabels[i], platform: ids[i] }]
+      : [],
   );
   return links.length ? (
     <div className="platform-links">
       {links.map((l) => (
-        <External key={l.label} href={l.url}>
-          {l.label}
-        </External>
+        <SocialPlatformLink
+          key={l.platform}
+          {...l}
+          ariaLabel={platformAriaLabel(
+            l.platform,
+            l.label,
+            release.title + ' — Acácias',
+          )}
+        />
       ))}
     </div>
   ) : (
@@ -148,16 +187,27 @@ type Overlay =
   | { type: 'gallery'; index: number }
   | null;
 
-export default function BandHome({ content: c, staticDemo = false }: { content: SiteContent; staticDemo?: boolean }) {
+export default function BandHome({
+  content: c,
+  staticDemo = false,
+}: {
+  content: SiteContent;
+  staticDemo?: boolean;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [archive, setArchive] = useState(false);
   const { rootRef, enabled, reducedMotion, scrolled, toggleMotion } =
     useSiteMotion();
   const featured = c.releases.find((r) => r.id === c.featuredId);
-  const instagram = c.socials.find(
-    (s) => s.label.toLowerCase() === 'instagram',
-  );
+  const socials = c.socials
+    .filter((s) => s.url)
+    .map((s) => ({ ...s, platform: identifyPlatform(s) }));
+  const instagram = socials.find((s) => s.platform === 'instagram');
+  const listening = listeningPlatforms.flatMap((platform) => {
+    const social = socials.find((s) => s.platform === platform);
+    return social ? [social] : [];
+  });
   const today = new Date().toLocaleDateString('en-CA', {
     timeZone: 'America/Sao_Paulo',
   });
@@ -214,7 +264,11 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
           className="small-wordmark"
           aria-label="Acácias — início"
         >
-          ACÁCIAS<span aria-hidden="true">✳</span>
+          <img
+            src="/images/logo.png"
+            alt="Banda Acácias"
+            className="header-logo-img"
+          />
         </a>
         <nav aria-label="Navegação principal" className="desktop-nav">
           {nav.map(([name, id]) => (
@@ -223,7 +277,7 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
             </a>
           ))}
         </nav>
-        <a href="#musica" className="header-cta">
+        <a href="#ouca" className="header-cta">
           OUÇA AGORA
           <ArrowUpRight size={16} />
         </a>
@@ -243,7 +297,13 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
           data-motion={enabled ? 'on' : 'off'}
         >
           <div className="mobile-menu-top">
-            <DialogTitle className="small-wordmark">ACÁCIAS</DialogTitle>
+            <DialogTitle className="small-wordmark">
+              <img
+                src="/images/logo.png"
+                alt="Banda Acácias"
+                className="header-logo-img"
+              />
+            </DialogTitle>
             <DialogClose className="round-button" aria-label="Fechar menu">
               <X />
             </DialogClose>
@@ -260,6 +320,19 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
               </a>
             ))}
           </nav>
+          <section
+            className="mobile-socials"
+            aria-label="Canais oficiais da Acácias"
+          >
+            {socials.map((social) => (
+              <SocialPlatformLink
+                key={social.id}
+                {...social}
+                variant="compact"
+                onClick={() => setMenuOpen(false)}
+              />
+            ))}
+          </section>
           <p className="eyebrow">TERESINA, PIAUÍ · BRASIL</p>
         </DialogContent>
       </Dialog>
@@ -285,22 +358,15 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
             <Tag>INDEPENDENTE POR NATUREZA</Tag>
           </div>
           <h1 className="hero-wordmark" id="hero-title" aria-label="ACÁCIAS">
-            {'ACÁCIAS'.split('').map((letter, index) => (
-              <span
-                key={index}
-                className="hero-letter"
-                aria-hidden="true"
-                style={{ '--letter-index': index } as CSSProperties}
-              >
-                <span>{letter}</span>
-              </span>
-            ))}
+            <img
+              src="/images/logo.png"
+              alt="Banda Acácias"
+              className="hero-logo-img"
+            />
           </h1>
           <div className="hero-bottom">
             <div className="hero-signature">
-              <span className="hero-asterisk" aria-hidden="true">
-                ✳
-              </span>
+              <BurstIcon className="hero-asterisk" />
               <div>
                 <p>
                   {c.hero.signature === 'Música para sentir de perto.' ? (
@@ -368,8 +434,10 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
           <div>
             {[0, 1].map((n) => (
               <span key={n}>
-                MPB CONTEMPORÂNEA <i>✳</i> DREAM POP <i>✳</i> AFETO EM FORMA DE
-                SOM <i>✳</i> FEITO NO PIAUÍ <i>✳</i>{' '}
+                MPB CONTEMPORÂNEA <BurstIcon className="ticker-burst" /> DREAM
+                POP <BurstIcon className="ticker-burst" /> AFETO EM FORMA DE SOM{' '}
+                <BurstIcon className="ticker-burst" /> FEITO NO PIAUÍ{' '}
+                <BurstIcon className="ticker-burst" />{' '}
               </span>
             ))}
           </div>
@@ -435,7 +503,11 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
                 <br />
                 PARA
                 <br />
-                <em>sentir</em>↗
+                <em>sentir</em>
+                <ArrowUpRight
+                  className="record-stamp-arrow"
+                  aria-hidden="true"
+                />
               </span>
             </div>
             <div className="featured-copy reveal">
@@ -544,8 +616,35 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
                     <Plus />
                   </button>
                 </div>
+                <Platforms release={r} />
               </article>
             ))}
+          </div>
+        </section>
+        <section
+          id="ouca"
+          className="listen-section"
+          aria-labelledby="listen-title"
+        >
+          <div className="listen-heading">
+            <h2 id="listen-title" className="display">
+              OUÇA ACÁCIAS
+              <ArrowUpRight aria-hidden="true" />
+            </h2>
+            <p>Escolha onde o som continua.</p>
+          </div>
+          <div className="listen-links">
+            {listening.length ? (
+              listening.map((social) => (
+                <SocialPlatformLink
+                  key={social.id}
+                  {...social}
+                  variant="listen"
+                />
+              ))
+            ) : (
+              <Pending>Plataformas oficiais em breve</Pending>
+            )}
           </div>
         </section>
         <section id="videos" className="video-section section-pad">
@@ -559,9 +658,7 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
               <br />
               <span className="outline-type">ACÁCIAS.</span>
             </h2>
-            <span className="video-flower" aria-hidden="true">
-              ✳
-            </span>
+            <BurstIcon className="video-flower" />
           </div>
           <button
             className="video-stage reveal"
@@ -572,34 +669,24 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
                 : 'Ver informações do videoclipe ' + c.video.title
             }
           >
-            {c.video.image ? (
-              <img
-                src={c.video.image}
-                alt={'Cena do videoclipe ' + c.video.title}
-                width={1600}
-                height={900}
-                loading="lazy"
-                decoding="async"
-              />
-            ) : (
-              <div className="video-placeholder">
-                <span className="eyebrow">FRAME OFICIAL A INSERIR</span>
-                <span className="video-placeholder-word" aria-hidden="true">
-                  SOM
-                  <br />
-                  <em>& imagem.</em>
-                </span>
-              </div>
-            )}
+            <VideoThumbnail
+              key={c.video.youtubeId + ':' + c.video.image}
+              video={c.video}
+            />
             <span className="play-button">
-              <Play fill="currentColor" size={28} />
+              <Play fill="currentColor" size={28} aria-hidden="true" />
             </span>
             <span className="video-stage-bottom">
               <span>{c.video.title}</span>
               <span className="eyebrow">
-                {c.video.youtubeId
-                  ? 'ASSISTIR AO CLIPE ↗'
-                  : 'VÍDEO OFICIAL · LINK PENDENTE'}
+                {c.video.youtubeId ? (
+                  <>
+                    ASSISTIR AO CLIPE
+                    <ArrowUpRight size={15} aria-hidden="true" />
+                  </>
+                ) : (
+                  'VÍDEO OFICIAL · LINK PENDENTE'
+                )}
               </span>
             </span>
           </button>
@@ -663,9 +750,7 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
             </div>
           ) : (
             <div className="agenda-empty reveal">
-              <span className="agenda-symbol" aria-hidden="true">
-                ↗
-              </span>
+              <ArrowUpRight className="agenda-symbol" aria-hidden="true" />
               <div>
                 <h3>Novas datas em breve.</h3>
                 <p>O próximo encontro ainda está sendo escrito.</p>
@@ -940,24 +1025,30 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
                 </External>
               )}
             </div>
-            <BookingForm staticContact={staticDemo ? { ...c.contact, instagramUrl: instagram?.url } : undefined} />
+            <BookingForm
+              staticContact={
+                staticDemo
+                  ? { ...c.contact, instagramUrl: instagram?.url }
+                  : undefined
+              }
+            />
           </div>
         </section>
-        <section className="social-strip">
-          <p>
+        <section className="social-strip" aria-labelledby="social-title">
+          <p id="social-title">
             A GENTE CONTINUA
             <br />
             <em>por aí.</em>
           </p>
           <div>
-            {c.socials.length ? (
-              c.socials
-                .filter((s) => s.url)
-                .map((s) => (
-                  <External key={s.id} href={s.url}>
-                    {s.label}
-                  </External>
-                ))
+            {socials.length ? (
+              socials.map((social) => (
+                <SocialPlatformLink
+                  key={social.id}
+                  {...social}
+                  variant="social"
+                />
+              ))
             ) : (
               <Pending>Redes e plataformas oficiais em breve</Pending>
             )}
@@ -981,7 +1072,11 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
           href="#inicio"
           aria-label="Acácias — voltar ao início"
         >
-          ACÁCIAS
+          <img
+            src="/images/logo.png"
+            alt="Banda Acácias"
+            className="footer-logo-img"
+          />
         </a>
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} ACÁCIAS</span>
@@ -1074,20 +1169,34 @@ export default function BandHome({ content: c, staticDemo = false }: { content: 
           )}
           {overlay?.type === 'video' && (
             <>
-              <DialogTitle className="dialog-title">
-                {c.video.title}
-              </DialogTitle>
-              <DialogDescription>Videoclipe · Acácias</DialogDescription>
+              <div className="video-channel">
+                <img
+                  className="video-channel-mark"
+                  src="/icon.png?v=2"
+                  alt=""
+                  width={56}
+                  height={56}
+                  aria-hidden="true"
+                />
+                <div>
+                  <DialogTitle className="dialog-title">
+                    {c.video.title}
+                  </DialogTitle>
+                  <DialogDescription>Videoclipe · Acácias</DialogDescription>
+                </div>
+              </div>
               {c.video.youtubeId ? (
                 <iframe
                   className="video-iframe"
                   src={
                     'https://www.youtube-nocookie.com/embed/' +
                     c.video.youtubeId +
-                    '?autoplay=1&rel=0'
+                    '?rel=0&autoplay=1'
                   }
                   title={c.video.title}
+                  loading="lazy"
                   allow="autoplay; encrypted-media; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
                   allowFullScreen
                 />
               ) : (
@@ -1149,9 +1258,13 @@ function BookingForm({ staticContact }: { staticContact?: BookingContact }) {
   const [prepared, setPrepared] = useState('');
   const [copied, setCopied] = useState(false);
   const [today, setToday] = useState('');
-  const destination = staticContact ? bookingDestination(staticContact, prepared) : null;
+  const destination = staticContact
+    ? bookingDestination(staticContact, prepared)
+    : null;
   useEffect(() => {
-    setToday(new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }));
+    setToday(
+      new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }),
+    );
   }, []);
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -1219,10 +1332,14 @@ function BookingForm({ staticContact }: { staticContact?: BookingContact }) {
       </div>
     );
   return (
-    <form className="booking-form" onSubmit={submit} onChange={() => {
-      setPrepared('');
-      setCopied(false);
-    }}>
+    <form
+      className="booking-form"
+      onSubmit={submit}
+      onChange={() => {
+        setPrepared('');
+        setCopied(false);
+      }}
+    >
       <div className="form-intro">
         <Tag>CONTE SOBRE O SEU EVENTO</Tag>
         <span>* Campos obrigatórios</span>
@@ -1275,11 +1392,7 @@ function BookingForm({ staticContact }: { staticContact?: BookingContact }) {
         </label>
         <label>
           Data prevista
-          <input
-            name="date"
-            type="date"
-            min={today || undefined}
-          />
+          <input name="date" type="date" min={today || undefined} />
         </label>
         <label>
           Telefone
@@ -1333,14 +1446,19 @@ function BookingForm({ staticContact }: { staticContact?: BookingContact }) {
       >
         {status === 'sending' ? (
           <>
-            {staticContact ? 'PREPARANDO SOLICITAÇÃO' : 'REGISTRANDO SOLICITAÇÃO'}
+            {staticContact
+              ? 'PREPARANDO SOLICITAÇÃO'
+              : 'REGISTRANDO SOLICITAÇÃO'}
             <LoaderCircle className="spin" size={20} />
           </>
         ) : (
           <>
             {staticContact
-              ? destination?.channel === 'WhatsApp' ? 'CONTINUAR NO WHATSAPP'
-                : destination ? 'PREPARAR E-MAIL' : 'COPIAR SOLICITAÇÃO'
+              ? destination?.channel === 'WhatsApp'
+                ? 'CONTINUAR NO WHATSAPP'
+                : destination
+                  ? 'PREPARAR E-MAIL'
+                  : 'COPIAR SOLICITAÇÃO'
               : 'CONTRATAR ACÁCIAS'}
             <ArrowUpRight size={20} />
           </>
@@ -1357,12 +1475,21 @@ function BookingForm({ staticContact }: { staticContact?: BookingContact }) {
           </p>
           <label>
             Sua solicitação
-            <textarea readOnly value={prepared} rows={7} onFocus={event => event.currentTarget.select()} />
+            <textarea
+              readOnly
+              value={prepared}
+              rows={7}
+              onFocus={(event) => event.currentTarget.select()}
+            />
           </label>
           {destination ? (
-            <External href={destination.url}>ABRIR {destination.channel.toUpperCase()}</External>
+            <External href={destination.url}>
+              ABRIR {destination.channel.toUpperCase()}
+            </External>
           ) : staticContact.instagramUrl ? (
-            <External href={staticContact.instagramUrl}>ABRIR INSTAGRAM DA ACÁCIAS</External>
+            <External href={staticContact.instagramUrl}>
+              ABRIR INSTAGRAM DA ACÁCIAS
+            </External>
           ) : null}
         </div>
       )}

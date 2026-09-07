@@ -243,6 +243,27 @@
 .mobile-menu[data-open] nav a:nth-child(7) {
   animation-delay: 400ms;
 }
+.mobile-menu[data-open] nav a:nth-child(8) {
+  animation-delay: 450ms;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :is(.band-experience, .mobile-menu, .media-dialog)[data-motion='on']
+    .platform-link-icon,
+  :is(.band-experience, .mobile-menu, .media-dialog)[data-motion='on']
+    .platform-link-arrow {
+    transition: transform 200ms ease;
+  }
+  :is(.band-experience, .mobile-menu, .media-dialog)[data-motion='on']
+    .platform-link:is(:hover, :focus-visible)
+    .platform-link-icon {
+    transform: translateY(-2px) scale(1.04);
+  }
+  :is(.band-experience, .mobile-menu, .media-dialog)[data-motion='on']
+    .platform-link:is(:hover, :focus-visible)
+    .platform-link-arrow {
+    transform: translate(2px, -2px);
+  }
+}
 .band-experience[data-page-visible='false'] *,
 .band-experience[data-page-visible='false'] *::before,
 .band-experience[data-page-visible='false'] *::after {

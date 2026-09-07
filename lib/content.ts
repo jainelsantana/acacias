@@ -4,7 +4,12 @@ import {
   instagramManifesto,
   instagramProfile,
   officialYoutube,
+  officialSpotify,
+  officialAppleMusic,
+  officialDeezer,
   portatilLinks,
+  esconderijoLinks,
+  soPorVoceLinks,
 } from './instagram-content.ts';
 
 export const platformFields = [
@@ -113,14 +118,28 @@ export const initialContent: SiteContent = {
     approved: false,
     ...instagramManifesto,
   },
-  featuredId: '',
+  featuredId: 'so-por-voce',
   releases: [
-    release('esconderijo', 'Esconderijo'),
-    { ...release('portatil', 'Portátil'), ...portatilLinks },
+    {
+      ...release('so-por-voce', 'Só Por Você'),
+      ...soPorVoceLinks,
+      format: 'Lançamento',
+      cover: '/images/acacias/so-por-voce-capa.webp',
+    },
+    {
+      ...release('esconderijo', 'Esconderijo'),
+      ...esconderijoLinks,
+      cover: '/images/acacias/esconderijo-capa.webp',
+    },
+    {
+      ...release('portatil', 'Portátil'),
+      ...portatilLinks,
+      cover: '/images/acacias/portatil-capa.webp',
+    },
   ],
   video: {
-    title: 'Beijos Sonoros, Grandes Concertos',
-    youtubeId: '',
+    title: 'Pertencer',
+    youtubeId: 'UfwHebZTH9k',
     image: '',
     credit: '',
   },
@@ -135,7 +154,13 @@ export const initialContent: SiteContent = {
     stageUrl: '',
   },
   contact: { email: '', whatsapp: '' },
-  socials: [instagramProfile, officialYoutube],
+  socials: [
+    instagramProfile,
+    officialYoutube,
+    officialSpotify,
+    officialAppleMusic,
+    officialDeezer,
+  ],
   news: [],
 };
 export const siteOrigin = 'https://acacias-musica.jainel238801.chatgpt.site';

@@ -9,7 +9,8 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import type { SiteContent } from '@/lib/content';
+import { initialContent, type SiteContent } from '@/lib/content';
+import { missingOfficialSocials } from '@/lib/platforms';
 
 type Field = [string, string, string?];
 type Section = {
@@ -65,7 +66,7 @@ const sections: Section[] = [
   {
     key: 'video',
     label: 'Videoclipe',
-    help: 'Informe apenas o código de 11 caracteres do vídeo oficial do YouTube, disponível depois de v= no link. O player só carrega quando a pessoa clicar.',
+    help: 'Informe apenas o código de 11 caracteres do vídeo oficial do YouTube, disponível depois de v= no link. Deixe o frame vazio para usar a thumbnail do YouTube. O player só carrega após o clique e não inicia automaticamente.',
     fields: [
       ['title', 'Título do videoclipe'],
       ['youtubeId', 'Código do YouTube'],
@@ -137,7 +138,7 @@ const sections: Section[] = [
     key: 'socials',
     label: 'Redes sociais',
     list: true,
-    help: 'Cadastre apenas URLs oficiais. Use os nomes Instagram, Spotify, YouTube, Apple Music, Deezer ou TikTok.',
+    help: 'Cadastre os perfis da banda no Instagram, YouTube, Spotify, Apple Music e Deezer. Estes links alimentam a faixa social, o menu e a área Ouça Acácias. Links de discos ficam em Lançamentos. Outras redes também são aceitas.',
     fields: [
       ['label', 'Nome da rede'],
       ['url', 'URL oficial', 'url'],
@@ -277,6 +278,9 @@ export default function Studio() {
     }
   }
   const section = sections.find((s) => s.key === active);
+  const missingSocials = data
+    ? missingOfficialSocials(data.content.socials, initialContent.socials)
+    : [];
   const objects =
     data && section
       ? section.list
@@ -349,6 +353,23 @@ export default function Studio() {
                     disabled={saving}
                     style={{ border: 0, padding: 0, minWidth: 0 }}
                   >
+                    {section.key === 'socials' && missingSocials.length > 0 && (
+                      <button
+                        className="button button-blue studio-add-socials"
+                        onClick={() =>
+                          update({
+                            ...data.content,
+                            socials: [
+                              ...data.content.socials,
+                              ...structuredClone(missingSocials),
+                            ],
+                          })
+                        }
+                      >
+                        <Plus size={18} aria-hidden="true" />
+                        Adicionar canais oficiais ausentes
+                      </button>
+                    )}
                     {objects.map((obj, index) => (
                       <div
                         key={obj.id || section.key}

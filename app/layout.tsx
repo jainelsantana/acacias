@@ -22,7 +22,10 @@ export const metadata: Metadata = {
     title: 'ACÁCIAS — Banda de Teresina',
     description: 'MPB contemporânea, dream pop e música brasileira.',
   },
-  icons: { icon: '/icon.svg' },
+  icons: {
+    icon: '/icon.png?v=2',
+    apple: '/apple-icon.png?v=2',
+  },
 };
 export default function RootLayout({
   children,
@@ -37,6 +40,8 @@ export default function RootLayout({
           type="font/woff2"
           crossOrigin="anonymous"
         />
+        <link rel="icon" type="image/png" href="/icon.png?v=2" />
+        <link rel="apple-touch-icon" href="/apple-icon.png?v=2" />
       </head>
       <body>{children}</body>
     </html>

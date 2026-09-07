@@ -35,7 +35,7 @@ for (const path of [
   '/',
   '/robots.txt',
   '/sitemap.xml',
-  '/icon.svg',
+  '/icon.png',
   '/fonts/anton.woff2',
   '/fonts/dm-sans.woff2',
 ]) {

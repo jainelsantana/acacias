@@ -64,6 +64,20 @@ npm run build
 npx tsc --noEmit
 ```
 
+### Plataformas e vídeo
+
+As capas de **Esconderijo** e **Portátil** usam os arquivos enviados para o site, convertidos em WebP com até 1200 px, sem recorte. Ficam em `public/images/acacias/*-capa.webp` e nos lançamentos do conteúdo inicial. A arte vertical de Portátil é exibida integralmente dentro do quadro quadrado. Os créditos de autoria permanecem vazios até serem informados; as URLs e os créditos continuam editáveis no Studio.
+
+**Só Por Você** é o lançamento em destaque inicial (`featuredId: 'so-por-voce'`), com a capa enviada em `so-por-voce-capa.webp`. Formato específico, ano, descrição e links de streaming podem ser completados em **Studio → Lançamentos**; informações não fornecidas permanecem vazias e o formato provisório é apenas “Lançamento”.
+
+Os cinco perfis oficiais ficam em `lib/instagram-content.ts` e no `initialContent.socials`. A Home consome `SiteContent`: o Studio controla os destinos da faixa social, do menu mobile e de **Ouça Acácias**. Os links de cada lançamento continuam separados dos perfis da banda e aparecem com ícones na discografia, no destaque e no modal.
+
+Conteúdo já salvo em D1 permanece intacto. Para incluir os perfis novos em um site já configurado, use **Redes sociais → Adicionar canais oficiais ausentes** no Studio, revise os campos e salve. A ação preserva URLs editadas e reconhece registros com IDs gerados pelo painel. Remover uma rede continua removendo sua exibição pública; não há reposição automática nem migração do banco.
+
+O vídeo inicial é [Pertencer](https://www.youtube.com/watch?v=UfwHebZTH9k), ID `UfwHebZTH9k`, com título confirmado nos metadados oficiais do YouTube. A imagem editada no Studio tem prioridade; sem ela, a thumbnail usa `maxresdefault`, depois `hqdefault` caso haja erro ou placeholder de baixa resolução, e finalmente a composição tipográfica existente. A área reserva proporção 16:9 em todas as telas. O iframe de privacidade do YouTube só é montado após o clique, sem autoplay. Vídeos previamente salvos também permanecem editáveis no Studio.
+
+`SocialPlatformLink` e `PlatformIcon` reutilizam SVGs locais do [Simple Icons](https://github.com/simple-icons/simple-icons) (CC0), com a paleta da Acácias, foco visível e respeito à preferência de movimento. Não foi adicionada dependência de produção. Verifique a compatibilidade dos dados com `node --experimental-strip-types scripts/verify-platforms.mjs`.
+
 Para alterações no banco, edite `db/schema.ts` e execute `npm run db:generate`. As migrações versionadas são aplicadas na publicação. Não reescreva migrações já publicadas.
 
 Para verificar a autenticação antes de configurar a conta real, aplique as migrações D1 locais, inicie a prévia na porta 3000 e execute `npm run test:auth`. O teste recusa executar se já existir uma conta, cria credenciais temporárias, verifica concorrência no primeiro acesso, login, expiração, logout, bloqueios e salvamento autorizado, e remove suas contas e sessões ao terminar. Para a verificação geral após configurar a conta, forneça as credenciais no ambiente do processo e execute `node scripts/verify.mjs`; esse teste cria uma solicitação fictícia apenas na base local e restaura o conteúdo após verificar persistência.
@@ -84,7 +98,7 @@ A prévia é privada, disponível à conta proprietária. Antes de tornar o site
 
 A troca de autenticação foi aplicada e testada no ambiente local. A política de acesso da hospedagem é independente do login do painel e permanece inalterada. Uma publicação posterior deve aplicar as migrações e provisionar o primeiro acesso no banco hospedado; o comando `studio:setup` atua exclusivamente no banco local. O custo de autenticação deve ser validado no limite de CPU da hospedagem sem reduzir os parâmetros de proteção da senha.
 
-As fontes são auto-hospedadas; mídias abaixo da abertura usam carregamento tardio; vídeos e áudio não carregam automaticamente; animações respeitam `prefers-reduced-motion`. O conteúdo principal é renderizado no servidor. Acessibilidade inclui landmarks, foco visível, labels, link de salto e modais com controle de foco. Não foi medida uma pontuação Lighthouse nem feita auditoria visual em navegador nesta execução; a meta de desempenho deve ser reavaliada após inserir os materiais reais.
+As fontes são auto-hospedadas; mídias abaixo da abertura usam carregamento tardio; vídeos e áudio não carregam automaticamente; animações respeitam `prefers-reduced-motion`. O conteúdo principal é renderizado no servidor. Acessibilidade inclui landmarks, foco visível, labels, link de salto e modais com controle de foco. A integração de plataformas foi verificada no Chrome em 375, 430, 768, 1024 e 1440 px, incluindo menu, foco, movimento reduzido, modal e fallbacks da thumbnail. A edição no Studio foi verificada com respostas de API isoladas, sem alterar o banco. Não foi medida uma pontuação Lighthouse.
 
 ## Tokens
 
@@ -98,4 +112,4 @@ As fontes são auto-hospedadas; mídias abaixo da abertura usam carregamento tar
 | Creme         | `#f7f4e9` |
 | Tinta         | `#24221e` |
 
-Botões têm alvo confortável; o celular reorganiza as composições, exibe menu integral e mantém os controles acessíveis. Os ícones vêm de Lucide. O monograma do favicon é provisório, não um logo oficial.
+Botões têm alvo confortável; o celular reorganiza as composições, exibe menu integral e mantém os controles acessíveis. Os ícones de interface vêm de Lucide e as marcas das plataformas usam SVGs locais do Simple Icons. O monograma do favicon é provisório, não um logo oficial.
