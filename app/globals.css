@@ -940,8 +940,8 @@ figcaption {
   margin-bottom: 8px;
 }
 .video-section {
-  background: var(--wine);
-  color: var(--pink);
+  background: var(--cream);
+  color: var(--ink);
   padding-bottom: 80px;
 }
 .video-heading {
@@ -954,7 +954,7 @@ figcaption {
   font-size: clamp(4rem, 10vw, 10rem);
 }
 .outline-type {
-  -webkit-text-stroke: 1px var(--pink);
+  -webkit-text-stroke: 1px currentColor;
   color: transparent;
 }
 .video-flower {
