@@ -5,7 +5,6 @@ import { SocialPlatformLink } from '@/components/social-platform-link';
 import { VideoThumbnail } from '@/components/video-thumbnail';
 import {
   identifyPlatform,
-  listeningPlatforms,
   platformAriaLabel,
   type Platform,
 } from '@/lib/platforms';
@@ -206,10 +205,6 @@ export default function BandHome({
     .filter((s) => s.url)
     .map((s) => ({ ...s, platform: identifyPlatform(s) }));
   const instagram = socials.find((s) => s.platform === 'instagram');
-  const listening = listeningPlatforms.flatMap((platform) => {
-    const social = socials.find((s) => s.platform === platform);
-    return social ? [social] : [];
-  });
   const today = new Date().toLocaleDateString('en-CA', {
     timeZone: 'America/Sao_Paulo',
   });
@@ -1017,7 +1012,11 @@ export default function BandHome({
             />
           </div>
         </section>
-        <section className="social-strip" aria-labelledby="social-title">
+        <section
+          id="ouca"
+          className="social-strip"
+          aria-labelledby="social-title"
+        >
           <p id="social-title">
             A GENTE CONTINUA
             <br />
@@ -1034,32 +1033,6 @@ export default function BandHome({
               ))
             ) : (
               <Pending>Redes e plataformas oficiais em breve</Pending>
-            )}
-          </div>
-        </section>
-        <section
-          id="ouca"
-          className="listen-section"
-          aria-labelledby="listen-title"
-        >
-          <div className="listen-heading">
-            <h2 id="listen-title" className="display">
-              OUÇA ACÁCIAS
-              <ArrowUpRight aria-hidden="true" />
-            </h2>
-            <p>Escolha onde o som continua.</p>
-          </div>
-          <div className="listen-links">
-            {listening.length ? (
-              listening.map((social) => (
-                <SocialPlatformLink
-                  key={social.id}
-                  {...social}
-                  variant="listen"
-                />
-              ))
-            ) : (
-              <Pending>Plataformas oficiais em breve</Pending>
             )}
           </div>
         </section>
