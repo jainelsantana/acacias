@@ -249,7 +249,23 @@ export default function BandHome({
       ref={rootRef}
       className="band-experience"
       data-motion={enabled ? 'on' : 'off'}
+      style={
+        {
+          '--brand-logo-image': `url("${assetPath('/images/logo.png')}")`,
+          '--brand-mark-image': `url("${assetPath('/images/acacias/a-floral.png')}")`,
+        } as CSSProperties
+      }
     >
+      <div className="site-intro" aria-hidden="true">
+        <span className="brand-logo-mask site-intro-logo site-intro-logo-full" />
+        <img
+          className="site-intro-logo site-intro-logo-mark"
+          src={assetPath('/icon.png?v=2')}
+          alt=""
+          width={512}
+          height={512}
+        />
+      </div>
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
@@ -266,11 +282,7 @@ export default function BandHome({
           className="small-wordmark"
           aria-label="Acácias — início"
         >
-          <img
-            src={assetPath('/images/logo.png')}
-            alt="Banda Acácias"
-            className="header-logo-img"
-          />
+          <span className="brand-mark-mask header-logo-img" aria-hidden="true" />
         </a>
         <nav aria-label="Navegação principal" className="desktop-nav">
           {nav.map(([name, id]) => (
@@ -300,10 +312,9 @@ export default function BandHome({
         >
           <div className="mobile-menu-top">
             <DialogTitle className="small-wordmark">
-              <img
-                src={assetPath('/images/logo.png')}
-                alt="Banda Acácias"
-                className="header-logo-img"
+              <span
+                className="brand-mark-mask header-logo-img"
+                aria-hidden="true"
               />
             </DialogTitle>
             <DialogClose className="round-button" aria-label="Fechar menu">
@@ -360,11 +371,7 @@ export default function BandHome({
             <Tag>INDEPENDENTE POR NATUREZA</Tag>
           </div>
           <h1 className="hero-wordmark" id="hero-title" aria-label="ACÁCIAS">
-            <img
-              src={assetPath('/images/logo.png')}
-              alt="Banda Acácias"
-              className="hero-logo-img"
-            />
+            <span className="brand-logo-mask hero-logo-img" aria-hidden="true" />
           </h1>
           <div className="hero-bottom">
             <div className="hero-signature">
@@ -1074,11 +1081,7 @@ export default function BandHome({
           href="#inicio"
           aria-label="Acácias — voltar ao início"
         >
-          <img
-            src={assetPath('/images/logo.png')}
-            alt="Banda Acácias"
-            className="footer-logo-img"
-          />
+          <span className="brand-logo-mask footer-logo-img" aria-hidden="true" />
         </a>
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} ACÁCIAS</span>

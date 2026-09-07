@@ -1,4 +1,32 @@
 /* Movement is progressive enhancement: no hidden content without JavaScript. */
+.site-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(165px, 22svh, 260px) 5vw 0;
+  overflow: hidden;
+  background: var(--yellow);
+  color: var(--blue);
+  pointer-events: none;
+  animation: site-intro-fade 2400ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.site-intro-logo {
+  width: min(82vw, 900px);
+  max-height: 55svh;
+  animation: site-intro-logo 2400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.site-intro-logo-mark {
+  display: none;
+}
+.band-experience[data-motion='off'] > .site-intro {
+  animation: site-intro-fade 2400ms cubic-bezier(0.65, 0, 0.35, 1) forwards !important;
+}
+.band-experience[data-motion='off'] > .site-intro .site-intro-logo {
+  animation: site-intro-logo 2400ms cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+}
 .band-experience {
   --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --reading-progress: 0;
@@ -297,6 +325,32 @@
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
 }
+@keyframes site-intro-fade {
+  0%,
+  62% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes site-intro-logo {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  16%,
+  62% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.025);
+  }
+}
 @keyframes letter-float {
   0%,
   100% {
@@ -395,6 +449,19 @@
   }
 }
 @media (max-width: 600px) {
+  .site-intro {
+    padding-top: clamp(110px, 17svh, 170px);
+  }
+
+  .site-intro-logo-full {
+    display: none;
+  }
+  .site-intro-logo-mark {
+    display: block;
+    width: min(58vw, 260px);
+    max-height: none;
+    filter: none;
+  }
   .band-experience .hero {
     min-height: 800px;
   }
@@ -422,6 +489,9 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .site-intro {
+    display: none;
+  }
   .band-experience .hero-wordmark,
   .band-experience .hero-photo,
   .band-experience .manifesto-side figure,
