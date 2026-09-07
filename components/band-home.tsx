@@ -630,32 +630,6 @@ export default function BandHome({
             ))}
           </div>
         </section>
-        <section
-          id="ouca"
-          className="listen-section"
-          aria-labelledby="listen-title"
-        >
-          <div className="listen-heading">
-            <h2 id="listen-title" className="display">
-              OUÇA ACÁCIAS
-              <ArrowUpRight aria-hidden="true" />
-            </h2>
-            <p>Escolha onde o som continua.</p>
-          </div>
-          <div className="listen-links">
-            {listening.length ? (
-              listening.map((social) => (
-                <SocialPlatformLink
-                  key={social.id}
-                  {...social}
-                  variant="listen"
-                />
-              ))
-            ) : (
-              <Pending>Plataformas oficiais em breve</Pending>
-            )}
-          </div>
-        </section>
         <section id="videos" className="video-section section-pad">
           <div className="section-top">
             <Tag>03 / SOM QUE VIRA IMAGEM</Tag>
@@ -1060,6 +1034,32 @@ export default function BandHome({
               ))
             ) : (
               <Pending>Redes e plataformas oficiais em breve</Pending>
+            )}
+          </div>
+        </section>
+        <section
+          id="ouca"
+          className="listen-section"
+          aria-labelledby="listen-title"
+        >
+          <div className="listen-heading">
+            <h2 id="listen-title" className="display">
+              OUÇA ACÁCIAS
+              <ArrowUpRight aria-hidden="true" />
+            </h2>
+            <p>Escolha onde o som continua.</p>
+          </div>
+          <div className="listen-links">
+            {listening.length ? (
+              listening.map((social) => (
+                <SocialPlatformLink
+                  key={social.id}
+                  {...social}
+                  variant="listen"
+                />
+              ))
+            ) : (
+              <Pending>Plataformas oficiais em breve</Pending>
             )}
           </div>
         </section>
